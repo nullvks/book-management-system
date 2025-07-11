@@ -23,3 +23,4 @@ public class Book {
     @Column(name = "author_name")
     private String authorName;
 }
+
