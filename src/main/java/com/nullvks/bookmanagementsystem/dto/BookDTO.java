@@ -13,4 +13,5 @@ public class BookDTO {
     private long id;
     private String title;
     private String authorName;
+    private String createdBy;
 }

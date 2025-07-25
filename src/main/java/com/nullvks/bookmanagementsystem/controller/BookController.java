@@ -1,16 +1,30 @@
 package com.nullvks.bookmanagementsystem.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import com.nullvks.bookmanagementsystem.dto.BookDTO;
 import com.nullvks.bookmanagementsystem.entity.Book;
 import com.nullvks.bookmanagementsystem.repository.BookRepository;
+import com.nullvks.bookmanagementsystem.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/api/books")
 public class BookController {
+
+    @Autowired
+    private BookService bookService;
+//    @Autowired
+//    private BookDTO bookDTO;
+//
+//    public ResponseEntity
+
+    @PostMapping
+    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
+        bookDTO = bookService.createBook(bookDTO);
+        return new ResponseEntity<>(bookDTO, HttpStatus.CREATED);
+    }
 
 //    @Autowired
 //    private BookDTO bookDTO;

@@ -22,5 +22,8 @@ public class Book {
 
     @Column(name = "author_name")
     private String authorName;
+
+    @Column(name = "createdBy")
+    private String createdBy;
 }
 
