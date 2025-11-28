@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Service 1: The Database
+  db:
+    image: postgres:16-alpine
+    container_name: book-db
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=bookdb
+    ports:
+      - "5432:5432" # Optional: Allows you to connect via DBeaver on host
+    volumes:
+      # This ensures data survives if you restart the container on the same machine
+      - postgres_data:/var/lib/postgresql/data
+      # This loads your default data automatically (See Step 4 below)
+      - ./sql-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d bookdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Service 2: Your Spring Boot Application
+  app:
+    build: .  # Builds using your Containerfile
+    container_name: book-app
+    ports:
+      - "8080:8080"
+    environment:
+      # IMPORTANT: "db" here refers to the service name above, NOT localhost
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/bookdb
+      - SPRING_DATASOURCE_USERNAME=myuser
+      - SPRING_DATASOURCE_PASSWORD=mypassword
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -26,6 +26,11 @@ public class BookController {
         return new ResponseEntity<>(bookDTO, HttpStatus.CREATED);
     }
 
+    @GetMapping("/hello")
+    public String helloWorld() {
+        return "Hello, World!";
+    }
+
 //    @Autowired
 //    private BookDTO bookDTO;
 
