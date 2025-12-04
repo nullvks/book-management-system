@@ -24,7 +24,9 @@ services:
 
   # Service 2: Your Spring Boot Application
   app:
-    build: .  # Builds using your Containerfile
+    build:  # Builds using your Containerfile
+      context: .
+      dockerfile: Containerfile  # <--- THIS FIXES THE ERROR
     container_name: book-app
     ports:
       - "8080:8080"
