@@ -9,6 +9,8 @@ import com.nullvks.bookmanagementsystem.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
@@ -26,6 +28,29 @@ public class BookController {
         return new ResponseEntity<>(bookDTO, HttpStatus.CREATED);
     }
 
+    @GetMapping("/selectBook/{id}")
+    public ResponseEntity<BookDTO> selectBook(@PathVariable long id) {
+        BookDTO selectedBook = bookService.selectBook(id);
+        return new ResponseEntity<>(selectedBook, HttpStatus.OK);
+    }
+
+    @GetMapping("/selectALlBook")
+    public ResponseEntity<List<BookDTO>> selectAllBook(){
+        List<BookDTO> allBook = bookService.selectAllBook();
+        return new ResponseEntity<>(allBook, HttpStatus.FORBIDDEN);
+    }
+    //alternative, RequestParam = get the request parameters
+//    @GetMapping("/selectBook/")
+//    public ResponseEntity<BookDTO> selectBook(@RequestParam long id) {
+//        BookDTO selectedBook = bookService.selectBook(id);
+//        return new ResponseEntity<>(selectedBook, HttpStatus.OK);
+//    }
+
+//    @PostMapping
+//    public ResponseEntity<BookDTO> update(@RequestBody BookDTO)
+
+
+//http://localhost:8080/api/books/hello
     @GetMapping("/hello")
     public String helloWorld() {
         return "Hello, World!";
