@@ -41,6 +41,22 @@ public class BookService {
     }
 
     //update book
+    public BookDTO updateBook(long bookID, BookDTO bookDTO){
+        Book book = bookRepository.findById(bookID).orElseThrow(()-> new RuntimeException("Book not found related to the id inserted"));
+        book.setTitle(bookDTO.getTitle());
+        book.setAuthorName(bookDTO.getAuthorName());
+        book.setCreatedBy(bookDTO.getCreatedBy());
+        BookDTO bookDTOreturned = BookMapper.toDTO(bookRepository.save(book));
+        return bookDTOreturned;
+    }
+
+    //delete book
+    public void deleteBook(long bookID){
+        bookRepository.deleteById(bookID);
+    }
+
+
+    //update book
 //    public Book updateBook(long bookID, String author, String bookTitle){
 //        BookDTO bookReturned = selectBook(bookID);
 ////        bookReturned.set
@@ -48,9 +64,9 @@ public class BookService {
 //    }
 
     //delete book
-    public void deleteBook(long bookID){
-        bookRepository.deleteById(bookID);
-    }
+  //  public void deleteBook(long bookID){
+//        bookRepository.deleteById(bookID);
+//    }
 
 
 

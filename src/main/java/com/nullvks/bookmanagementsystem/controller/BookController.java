@@ -39,6 +39,18 @@ public class BookController {
         List<BookDTO> allBook = bookService.selectAllBook();
         return new ResponseEntity<>(allBook, HttpStatus.FORBIDDEN);
     }
+
+    @PutMapping("/updateBook/{id}")
+    public ResponseEntity<BookDTO> updateBookByID(@PathVariable long id, @RequestBody BookDTO bookDTO){
+        BookDTO bookUpdated = bookService.updateBook(id, bookDTO);
+        return new ResponseEntity<>(bookUpdated, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/deleteNook/{id}")
+    public ResponseEntity<BookDTO> deleteBookByID(@PathVariable long id){
+        bookService.deleteBook(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     //alternative, RequestParam = get the request parameters
 //    @GetMapping("/selectBook/")
 //    public ResponseEntity<BookDTO> selectBook(@RequestParam long id) {
