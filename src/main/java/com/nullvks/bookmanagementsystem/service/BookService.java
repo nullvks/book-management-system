@@ -2,6 +2,7 @@ package com.nullvks.bookmanagementsystem.service;
 
 import com.nullvks.bookmanagementsystem.dto.BookDTO;
 import com.nullvks.bookmanagementsystem.entity.Book;
+import com.nullvks.bookmanagementsystem.exception.BookNotFoundException;
 import com.nullvks.bookmanagementsystem.mapper.BookMapper;
 import com.nullvks.bookmanagementsystem.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,18 @@ public class BookService {
 
     //delete book
     public void deleteBook(long bookID){
+        if(!bookRepository.existsById(bookID)){
+            throw new BookNotFoundException("Cannot find book to be deleted for id:"+ bookID);
+        }
         bookRepository.deleteById(bookID);
+    }
+
+    //search book
+    public List<BookDTO> searchBook(String bookQuery){
+        List<Book> book = bookRepository.findByAuthorNameContainingIgnoreCase(bookQuery);
+        //cant use BookMapper.toDTO() use below for List
+        List bookDTO = book.stream().map(BookMapper::toDTO).collect(Collectors.toList());
+        return bookDTO;
     }
 
 

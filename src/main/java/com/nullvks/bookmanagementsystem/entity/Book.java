@@ -23,7 +23,7 @@ public class Book {
     @Column(name = "author_name")
     private String authorName;
 
-    @Column(name = "createdBy")
+    @Column(name = "created_by")
     private String createdBy;
 }
 
