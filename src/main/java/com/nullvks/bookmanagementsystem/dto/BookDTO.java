@@ -2,11 +2,13 @@ package com.nullvks.bookmanagementsystem.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookDTO {
+public class BookDTO implements Serializable{
     private long id;
 
     @NotBlank(message = "Title cannot be blank")

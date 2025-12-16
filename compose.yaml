@@ -21,6 +21,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  redis: #add redis
+    image: redis:alpine
+    container_name: book-redis
+    ports:
+      - "6379:6379"
 
   # Service 2: Your Spring Boot Application
   app:
@@ -36,9 +41,13 @@ services:
       - SPRING_DATASOURCE_USERNAME=myuser
       - SPRING_DATASOURCE_PASSWORD=mypassword
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
     depends_on:
       db:
         condition: service_healthy
+      redis: # add reddis for cache
+        condition: service_started
 
 volumes:
   postgres_data:

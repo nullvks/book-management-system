@@ -8,6 +8,8 @@ import com.nullvks.bookmanagementsystem.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.cache.annotation.Cacheable;
+
 import java.util.List;
 import java.util.stream.Collectors;
 //import com.nullvks.bookmanagementsystem.mapper;
@@ -26,6 +28,9 @@ public class BookService {
     }
 
     //select book
+    // 1. "books" is the name of the folder in Redis
+    // 2. key = "#id" means "Use the ID as the unique filename"
+    @Cacheable(value = "books", key = "#bookID")
     public BookDTO selectBook(long bookID){
         Book bookEntity =  bookRepository.findById(bookID).orElseThrow(()-> new RuntimeException("Book not found"));
         BookDTO bookDTO = BookMapper.toDTO(bookEntity);
