@@ -6,18 +6,18 @@ services:
     image: postgres:16-alpine
     container_name: book-db
     environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_USER=andrewhernando
+      - POSTGRES_PASSWORD=p@ssw0rd
       - POSTGRES_DB=bookdb
     ports:
-      - "5432:5432" # Optional: Allows you to connect via DBeaver on host
+      - "5433:5432" # Optional: Allows you to connect via DBeaver on host
     volumes:
       # This ensures data survives if you restart the container on the same machine
       - postgres_data:/var/lib/postgresql/data
-      # This loads your default data automatically (See Step 4 below)
-      - ./sql-init:/docker-entrypoint-initdb.d
+      # This loads your default data automatically (See Step 4 below) (no more used since using flyway)
+      #- ./sql-init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d bookdb"]
+      test: ["CMD-SHELL", "pg_isready -U andrewhernando -d bookdb"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -38,8 +38,8 @@ services:
     environment:
       # IMPORTANT: "db" here refers to the service name above, NOT localhost
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/bookdb
-      - SPRING_DATASOURCE_USERNAME=myuser
-      - SPRING_DATASOURCE_PASSWORD=mypassword
+      - SPRING_DATASOURCE_USERNAME=andrewhernando
+      - SPRING_DATASOURCE_PASSWORD=p@ssw0rd
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
