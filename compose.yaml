@@ -10,7 +10,7 @@ services:
       - POSTGRES_PASSWORD=p@ssw0rd
       - POSTGRES_DB=bookdb
     ports:
-      - "5433:5432" # Optional: Allows you to connect via DBeaver on host
+      - "5433:5432" # Optional: Allows you to connect via DBeaver on host (Changed to 5433 to avoid conflicts)
     volumes:
       # This ensures data survives if you restart the container on the same machine
       - postgres_data:/var/lib/postgresql/data
@@ -21,17 +21,39 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  # Service 5: Redis (caching)
   redis: #add redis
     image: redis:alpine
     container_name: book-redis
     ports:
       - "6379:6379"
 
-  # Service 2: Your Spring Boot Application
-  app:
+  # Service 3: Kafka (The Event Bus - KRaft Mode)
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: book-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      # These are magic settings to make Kafka work without Zookeeper
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+
+  # Service 2: Your Spring Boot Application (Renamed to book-service)
+  book-service:
     build:  # Builds using your Containerfile
-      context: .
-      dockerfile: Containerfile  # <--- THIS FIXES THE ERROR
+      context: ./book-service      # <--- LOOK IN SUBFOLDER
+      dockerfile: Containerfile    # <--- THIS FIXES THE ERROR
     container_name: book-app
     ports:
       - "8080:8080"
@@ -43,11 +65,40 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092 # Connect to Kafka
     depends_on:
       db:
         condition: service_healthy
       redis: # add reddis for cache
         condition: service_started
+      kafka:
+        condition: service_started
 
+  # Service 4: The New Notification Service
+  notification-service:
+    build:
+      context: ./notification-service # <--- LOOK IN SUBFOLDER
+      dockerfile: Containerfile
+      network: host
+    container_name: notification-app
+    ports:
+      - "8081:8080" # Map Host 8081 to Container 8080 (Different port than book-service!)
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      kafka:
+        condition: service_started
+  # Service 6: Kafka UI
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_started
 volumes:
   postgres_data:

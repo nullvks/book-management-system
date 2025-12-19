@@ -6,6 +6,7 @@ import com.nullvks.bookmanagementsystem.exception.BookNotFoundException;
 import com.nullvks.bookmanagementsystem.mapper.BookMapper;
 import com.nullvks.bookmanagementsystem.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -20,12 +21,28 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
     //insert book
     public BookDTO createBook(BookDTO bookDTO){
-        Book book = BookMapper.toEntity(bookDTO);
-        bookDTO = BookMapper.toDTO(bookRepository.save(book));
+        Book savedBook = BookMapper.toEntity(bookDTO);
+
+        // send to kafka topic group for consumer
+        kafkaTemplate.send("book-created", BookMapper.toDTO(savedBook));
+
+        bookDTO = BookMapper.toDTO(bookRepository.save(savedBook));
         return bookDTO;
     }
+
+//    public BookDTO createBook(BookDTO bookDTO) {
+//        Book savedBook = bookRepository.save(BookMapper.toEntity(bookDTO));
+//
+//        // --- DID YOU ADD THIS LINE? ---
+//        kafkaTemplate.send("book-created", BookMapper.toDTO(savedBook));
+//
+//        return BookMapper.toDTO(savedBook);
+//    }
 
     //select book
     // 1. "books" is the name of the folder in Redis
@@ -71,6 +88,10 @@ public class BookService {
         List bookDTO = book.stream().map(BookMapper::toDTO).collect(Collectors.toList());
         return bookDTO;
     }
+
+
+
+
 
 
     //update book
