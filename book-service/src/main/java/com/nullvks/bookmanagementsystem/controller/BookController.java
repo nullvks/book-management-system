@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 //Notes
 //http://localhost:8080/swagger-ui/index.html - Swagger UI
@@ -77,6 +78,64 @@ public class BookController {
     @GetMapping("/hello")
     public String helloWorld() {
         return "Hello, World!";
+    }
+
+    //List of all available API routes
+    @GetMapping("/routes")
+    public ResponseEntity<List<Map<String, String>>> getAvailableRoutes() {
+        List<Map<String, String>> routes = List.of(
+            Map.of(
+                "method", "POST",
+                "endpoint", "/api/books",
+                "description", "Create a new book",
+                "example", "http://localhost:8080/api/books",
+                "requestBody", "{\"title\": \"Book Title\", \"authorName\": \"Author Name\"}"
+            ),
+            Map.of(
+                "method", "GET",
+                "endpoint", "/api/books/{id}",
+                "description", "Get a book by ID",
+                "example", "http://localhost:8080/api/books/1",
+                "requestBody", "N/A"
+            ),
+            Map.of(
+                "method", "GET",
+                "endpoint", "/api/books",
+                "description", "Get all books",
+                "example", "http://localhost:8080/api/books",
+                "requestBody", "N/A"
+            ),
+            Map.of(
+                "method", "PUT",
+                "endpoint", "/api/books/{id}",
+                "description", "Update a book by ID",
+                "example", "http://localhost:8080/api/books/1",
+                "requestBody", "{\"title\": \"Updated Title\", \"authorName\": \"Updated Author\"}"
+            ),
+            Map.of(
+                "method", "DELETE",
+                "endpoint", "/api/books/{id}",
+                "description", "Delete a book by ID",
+                "example", "http://localhost:8080/api/books/1",
+                "requestBody", "N/A"
+            ),
+            Map.of(
+                "method", "GET",
+                "endpoint", "/api/books/search?book={title}",
+                "description", "Search books by title",
+                "example", "http://localhost:8080/api/books/search?book=Gatsby",
+                "requestBody", "N/A"
+            ),
+            Map.of(
+                "method", "GET",
+                "endpoint", "/api/docs/routes",
+                "description", "List all available API routes (this endpoint)",
+                "example", "http://localhost:8080/api/books/routes",
+                "requestBody", "N/A"
+            )
+        );
+
+        return new ResponseEntity<>(routes, HttpStatus.OK);
     }
 
 //    @Autowired
