@@ -16,12 +16,6 @@ solution.
 
 Hint: Make sure to define the appropriate entity class for the book and annotate it properly for database mapping.
 
-Extra feature added:
-- Podman Compose for easier deployment
-- Redis for DB performance via caching
-- Input validation
-- Flyway for DB migration
-
 ---
 
 ## Prerequisites
